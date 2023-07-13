@@ -19,5 +19,7 @@
 使用 gcc 11.3.0 for Ubuntu 编译，使用 -O3 优化级别。 在 11代Intel Core i7 CPU上执行。 每个基准测试包括在 100 个数据块上完成的8000000轮加密。
 
 aes_scalar：22 秒
+
 aes_neon：16 秒
+
 aes_bitslice：12 秒
