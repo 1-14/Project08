@@ -90,6 +90,33 @@
 
 使用ARMv8的NEON SIMD指令实现
 
+### ARM指令注解
+
+**加载S-Box表：**
+
+const uint8_t sbox_enc[256] 和 const uint8_t sbox_dec[256] 是AES加密和解密中使用的S-Box表，存储了不同字节的变换值。在ARMv8的NEON指令集中，S-Box表以NEON向量形式加载到uint8x16x4_t 结构体变量 sboxv_enc 和 sboxv_dec 中。这里使用了4个128位宽度的NEON向量，每个向量包含4个256位S-Box表的行。
+
+**加载加密和解密用的密钥：**
+
+gen_keys()函数根据输入的密钥长度（128位、192位或256位）生成AES加密和解密的轮密钥。在AES中，密钥长度决定了加密或解密需要执行的轮数。生成的轮密钥存储在 uint8x16_t 数组中。
+
+**加密算法：**
+
+encrypt()函数用于对128位数据块执行AES加密。它采用输入数据块和生成的轮密钥数组，并使用NEON指令执行每个加密轮的操作：SubBytes，ShiftRows，MixColumns和AddRoundKey。加密轮是重复的，每个轮次使用轮密钥数组的一个元素。
+
+**解密算法：**
+
+decrypt()函数用于对128位数据块执行AES解密。它与加密算法类似，但顺序是相反的。它逆序使用生成的轮密钥数组，并按照逆向顺序执行每个解密轮的操作：InvShiftRows，InvSubBytes，InvMixColumns和AddRoundKey。
+
+**其他辅助函数：**
+
+print_vector() 和 print_array()函数用于打印128位向量和128位数组。
+load_encryption_table() 和 load_decryption_table()函数用于加载S-Box表。
+
+**总结**
+
+aes_neon.cpp通过利用SIMD向量化处理，可以提高加密和解密的效率。在ARMv8上，NEON指令集可以在单个指令中同时处理多个数据元素，加速数据处理过程。
+
 ## aes_bitslice.cpp
 
 此实现使用位切片算法，该算法允许并行处理 8 个加密/解密。 仅支持 128 位和 256 位密钥。
